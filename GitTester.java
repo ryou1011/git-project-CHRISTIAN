@@ -73,7 +73,18 @@ public class GitTester {
     public static boolean treeworking() throws NoSuchAlgorithmException, IOException
     {
         File testTree = new File("testTree");
-        Git.addTree("./git/index/", testTree.getName());
+        testTree.mkdir();
+        File inTree1 = new File("testTree/inTree1");
+        File inTree2 = new File("testTree/inTree2");
+        if (inTree1.createNewFile() == true)
+        {
+            System.out.println("file in Tree made");
+        }
+        if (inTree2.createNewFile() == true)
+        {
+            System.out.println("file in Tree made");
+        }
+        Git.addTree("./", testTree.getName());
         return true;
     }
 

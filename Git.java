@@ -77,6 +77,10 @@ public class Git {
         File treeObject = new File("./git/objects/" + hash);
         FileOutputStream out = new FileOutputStream(treeObject);
         out.write(data);
+        for (File subfile : directory.listFiles())
+        {
+            makeBlob(subfile);
+        }
         System.out.println("tree made");
         PrintWriter toIndex = new PrintWriter(new BufferedWriter(new FileWriter("./git/index", true)));
         toIndex.println("tree " + hash + " " + directoryName);
@@ -102,6 +106,27 @@ public class Git {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(deflater.deflate(new byte[unzipped.length]));
         return out.toByteArray();
+    }
+    public static void TestDirWithFiles()
+    {
+        File objdir = new File("git/objects");
+        for (File subfile : objdir.listFiles()) {
+            if (subfile.isDirectory())
+            {
+                for (File hashfile : subfile.listFiles())
+                {
+                    hashfile.delete();
+                }
+                subfile.delete();
+            }
+        }
+        File ind = new File("git/index");
+        String data = "";
+        try (FileOutputStream outputStream = new FileOutputStream(ind)) {
+            outputStream.write(data.getBytes());
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
