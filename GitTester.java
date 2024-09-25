@@ -21,6 +21,15 @@ public class GitTester {
             System.out.println("zip success");
         else
             System.out.println("zip failure");
+        Git.init();
+        if(treeworking())
+        {
+            System.out.println("tree success");
+        }
+        else
+        {
+            System.out.println("tree failure");
+        }
     }
 
     public static boolean initWorking() throws IOException {
@@ -60,6 +69,12 @@ public class GitTester {
         //Git.wipe(testBlob);
         //Git.wipe(new File("./git"));
         return false;
+    }
+    public static boolean treeworking() throws NoSuchAlgorithmException, IOException
+    {
+        File testTree = new File("testTree");
+        Git.addTree("./git/index/", testTree.getName());
+        return true;
     }
 
     public static boolean zipWorking() throws IOException, NoSuchAlgorithmException {

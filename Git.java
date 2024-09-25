@@ -69,6 +69,21 @@ public class Git {
         }
         toIndex.close();
     }
+    public static void addTree(String directoryPath, String directoryName) throws IOException, NoSuchAlgorithmException
+    {
+        File directory = new File(directoryPath + directoryName);
+        byte[] data = directoryName.getBytes();
+        String hash = hashBlob(data);
+        File treeObject = new File("./git/objects/" + hash);
+        FileOutputStream out = new FileOutputStream(treeObject);
+        out.write(data);
+        System.out.println("tree made");
+        PrintWriter toIndex = new PrintWriter(new BufferedWriter(new FileWriter("./git/index", true)));
+        toIndex.println("tree " + hash + " " + directoryName);
+        toIndex.close();
+        out.close();
+
+    }
 
     public static String hashBlob(byte[] data) throws IOException, NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
