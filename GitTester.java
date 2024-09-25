@@ -28,15 +28,15 @@ public class GitTester {
         File objects = new File("./git/objects");
         File index = new File("./git/index");
         if (!git.exists() || !objects.exists() || !index.exists()) {
-            Git.wipe(objects);
+            //Git.wipe(objects);
             return false;
         }
         Git.init();
         if (!objects.exists()) {
-            Git.wipe(git);
+            //Git.wipe(git);
             return false;
         }
-        Git.wipe(git);
+        //Git.wipe(git);
         return true;
     }
 
@@ -51,14 +51,14 @@ public class GitTester {
             for (String blobHash : objects.list()) {
                 if (Arrays.equals(Files.readAllBytes((new File("./git/objects/" + blobHash)).toPath()),
                         Files.readAllBytes(testBlob.toPath()))) {
-                    Git.wipe(testBlob);
-                    Git.wipe(new File("./git"));
+                    //Git.wipe(testBlob);
+                    //Git.wipe(new File("./git"));
                     return true;
                 }
             }
         }
-        Git.wipe(testBlob);
-        Git.wipe(new File("./git"));
+        //Git.wipe(testBlob);
+        //Git.wipe(new File("./git"));
         return false;
     }
 
@@ -75,8 +75,8 @@ public class GitTester {
         for (String hashedBlob : objects.list()) {
             al.add(hashedBlob);
         }
-        Git.wipe(new File("./git"));
-        Git.wipe(testBlob);
+        //Git.wipe(new File("./git"));
+        //Git.wipe(testBlob);
         return al.get(0) != al.get(1);
     }
 }

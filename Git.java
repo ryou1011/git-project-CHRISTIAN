@@ -55,7 +55,18 @@ public class Git {
 
         // add entry to index
         PrintWriter toIndex = new PrintWriter(new BufferedWriter(new FileWriter("./git/index", true)));
-        toIndex.println(hash + " " + file.getName());
+        if(file.isDirectory())
+        {
+            toIndex.println("tree " + hash + " " + file.getName());
+        }
+        else if(file.isFile())
+        {
+            toIndex.println("blob " + hash + " " + file.getName());
+        }
+        else
+        {
+            toIndex.println(hash + " " + file.getName());
+        }
         toIndex.close();
     }
 
