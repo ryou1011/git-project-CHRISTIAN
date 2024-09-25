@@ -84,7 +84,20 @@ public class GitTester {
         {
             System.out.println("file in Tree made");
         }
-        Git.addTree("./", testTree.getName());
+        FileOutputStream out = new FileOutputStream(inTree1);
+        out.write("name".getBytes());
+        FileOutputStream out2 = new FileOutputStream(inTree2);
+        out2.write("Test2".getBytes());
+        File testTreeDir = new File("testTree/testDir");
+        testTreeDir.mkdir();
+        File inTree3 = new File("testTree/testDir/inTree3");
+        if (inTree3.createNewFile() == true)
+        {
+            System.out.println("file in Tree in dir made");
+        }
+        out.close();
+        out2.close();
+        Git.addTree(testTree.getPath(), testTree.getName());
         return true;
     }
 

@@ -71,15 +71,30 @@ public class Git {
     }
     public static void addTree(String directoryPath, String directoryName) throws IOException, NoSuchAlgorithmException
     {
-        File directory = new File(directoryPath + directoryName);
+        File directory = new File(directoryPath);
         byte[] data = directoryName.getBytes();
         String hash = hashBlob(data);
         File treeObject = new File("./git/objects/" + hash);
         FileOutputStream out = new FileOutputStream(treeObject);
         out.write(data);
+        System.out.println(directory.getPath());
+        if (directory.listFiles() == null)
+        {
+            System.out.println("this dir is empty");
+        }
+        else
+        {
         for (File subfile : directory.listFiles())
         {
-            makeBlob(subfile);
+            if (subfile.isDirectory())
+            {
+                addTree(subfile.getPath(), subfile.getName());
+            }
+            else
+            {
+                makeBlob(subfile);
+            }
+        }
         }
         System.out.println("tree made");
         PrintWriter toIndex = new PrintWriter(new BufferedWriter(new FileWriter("./git/index", true)));
