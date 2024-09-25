@@ -69,6 +69,36 @@ public class Git {
         }
         toIndex.close();
     }
+    //Makes a blob the exact same way but adds the full path.
+    public static void makeBlobInDir(File file) throws IOException, NoSuchAlgorithmException {
+        byte[] data = Files.readAllBytes(file.toPath());
+        if (compress)
+            data = zip(data);
+        String hash = hashBlob(data);
+        File blobject = new File("./git/objects/" + hash);
+
+        // copy data to objects file
+        FileOutputStream out = new FileOutputStream(blobject);
+        out.write(data);
+        out.close();
+
+        // add entry to index
+        PrintWriter toIndex = new PrintWriter(new BufferedWriter(new FileWriter("./git/index", true)));
+        if(file.isDirectory())
+        {
+            toIndex.println("tree " + hash + " " + file.getPath());
+        }
+        else if(file.isFile())
+        {
+            toIndex.println("blob " + hash + " " + file.getPath());
+        }
+        else
+        {
+            toIndex.println(hash + " " + file.getName());
+        }
+        toIndex.close();
+    }
+    //Adds a tree using the path and name
     public static void addTree(String directoryPath, String directoryName) throws IOException, NoSuchAlgorithmException
     {
         File directory = new File(directoryPath);
@@ -78,6 +108,7 @@ public class Git {
         FileOutputStream out = new FileOutputStream(treeObject);
         out.write(data);
         System.out.println(directory.getPath());
+        //checks everything within the directory
         if (directory.listFiles() == null)
         {
             System.out.println("this dir is empty");
@@ -86,13 +117,14 @@ public class Git {
         {
         for (File subfile : directory.listFiles())
         {
+            // if there are directories within directories
             if (subfile.isDirectory())
             {
                 addTree(subfile.getPath(), subfile.getName());
             }
             else
             {
-                makeBlob(subfile);
+                makeBlobInDir(subfile);
             }
         }
         }
