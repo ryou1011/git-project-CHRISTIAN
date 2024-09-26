@@ -124,8 +124,16 @@ public class Git {
             }
             else
             {
-                makeBlobInDir(subfile);
-                allFiles += "blob " +  hashBlob(Files.readAllBytes(subfile.toPath())) + " " + subfile.getName() + "\n";
+                if(subfile.getName().substring(0,1).equals("."))
+                {
+                    makeBlobInDir(subfile);
+                    allFiles += "";
+                    System.out.println("this file is hidden");
+                }
+                else{
+                    makeBlobInDir(subfile);
+                    allFiles += "blob " +  hashBlob(Files.readAllBytes(subfile.toPath())) + " " + subfile.getName() + "\n";
+                }
             }
         }
         }
