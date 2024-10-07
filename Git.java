@@ -1,7 +1,8 @@
+
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.MessageDigest;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.Deflater;
 
@@ -27,24 +28,35 @@ public class Git {
         }
         File index = new File("./git/index");
         exists = !(index.createNewFile()) && exists;
-        if (exists)
+        if (exists) {
             System.out.println("Git Repository already exists");
+        }
+
+        File HEAD = new File("./git/HEAD");
+        exists = !(index.createNewFile()) && exists;
+        if (exists) {
+            System.out.println("HEAD Repository already exists");
+        }
     }
 
     // recursively remove git folder
     public static void wipe(File current) throws IOException {
-        if (!current.exists())
+        if (!current.exists()) {
             return;
-        if (current.listFiles() != null)
-            for (File file : current.listFiles())
+        }
+        if (current.listFiles() != null) {
+            for (File file : current.listFiles()) {
                 wipe(file);
+            }
+        }
         current.delete();
     }
 
     public static void makeBlob(File file) throws IOException, NoSuchAlgorithmException {
         byte[] data = Files.readAllBytes(file.toPath());
-        if (compress)
+        if (compress) {
             data = zip(data);
+        }
         String hash = hashBlob(data);
         File blobject = new File("./git/objects/" + hash);
 
@@ -55,25 +67,21 @@ public class Git {
 
         // add entry to index
         PrintWriter toIndex = new PrintWriter(new BufferedWriter(new FileWriter("./git/index", true)));
-        if(file.isDirectory())
-        {
+        if (file.isDirectory()) {
             toIndex.println("tree " + hash + " " + file.getName());
-        }
-        else if(file.isFile())
-        {
+        } else if (file.isFile()) {
             toIndex.println("blob " + hash + " " + file.getName());
-        }
-        else
-        {
+        } else {
             toIndex.println(hash + " " + file.getName());
         }
         toIndex.close();
     }
+
     //Makes a blob the exact same way but adds the full path.
     public static void makeBlobInDir(File file) throws IOException, NoSuchAlgorithmException {
         byte[] data = Files.readAllBytes(file.toPath());
         //if (compress)
-           // data = zip(data);
+        // data = zip(data);
         String hash = hashBlob(data);
         File blobject = new File("./git/objects/" + hash);
 
@@ -84,23 +92,18 @@ public class Git {
 
         // add entry to index
         PrintWriter toIndex = new PrintWriter(new BufferedWriter(new FileWriter("./git/index", true)));
-        if(file.isDirectory())
-        {
+        if (file.isDirectory()) {
             toIndex.println("tree " + hash + " " + file.getPath());
-        }
-        else if(file.isFile())
-        {
+        } else if (file.isFile()) {
             toIndex.println("blob " + hash + " " + file.getPath());
-        }
-        else
-        {
+        } else {
             toIndex.println(hash + " " + file.getName());
         }
         toIndex.close();
     }
+
     //Adds a tree using the path and name
-    public static void addTree(String directoryPath, String directoryName) throws IOException, NoSuchAlgorithmException
-    {
+    public static void addTree(String directoryPath, String directoryName) throws IOException, NoSuchAlgorithmException {
         File directory = new File(directoryPath);
         String allFiles = "";
         String hash = getDirectoryHash(directory);
@@ -108,34 +111,25 @@ public class Git {
         FileOutputStream out = new FileOutputStream(treeObject);
         System.out.println(directory.getPath());
         //checks everything within the directory
-        if (directory.listFiles() == null)
-        {
+        if (directory.listFiles() == null) {
             System.out.println("this diectory is empty");
-        }
-        else
-        {
-        for (File subfile : directory.listFiles())
-        {
-            // if there are directories within directories
-            if (subfile.isDirectory())
-            {
-                addTree(subfile.getPath(), subfile.getName());
-                allFiles += ("tree " + getDirectoryHash(subfile) + " " + subfile.getName() + "\n");
-            }
-            else
-            {
-                if(subfile.getName().substring(0,1).equals("."))
-                {
-                    makeBlobInDir(subfile);
-                    allFiles += "";
-                    System.out.println("this file is hidden");
-                }
-                else{
-                    makeBlobInDir(subfile);
-                    allFiles += "blob " +  hashBlob(Files.readAllBytes(subfile.toPath())) + " " + subfile.getName() + "\n";
+        } else {
+            for (File subfile : directory.listFiles()) {
+                // if there are directories within directories
+                if (subfile.isDirectory()) {
+                    addTree(subfile.getPath(), subfile.getName());
+                    allFiles += ("tree " + getDirectoryHash(subfile) + " " + subfile.getName() + "\n");
+                } else {
+                    if (subfile.getName().substring(0, 1).equals(".")) {
+                        makeBlobInDir(subfile);
+                        allFiles += "";
+                        System.out.println("this file is hidden");
+                    } else {
+                        makeBlobInDir(subfile);
+                        allFiles += "blob " + hashBlob(Files.readAllBytes(subfile.toPath())) + " " + subfile.getName() + "\n";
+                    }
                 }
             }
-        }
         }
         out.write(allFiles.getBytes());
         System.out.println("tree made");
@@ -151,8 +145,9 @@ public class Git {
         byte[] messageDigest = md.digest(data);
         BigInteger n = new BigInteger(1, messageDigest);
         String hash = n.toString(16);
-        while (hash.length() < 40)
+        while (hash.length() < 40) {
             hash = "0" + hash;
+        }
         return hash;
     }
 
@@ -164,22 +159,18 @@ public class Git {
         out.write(deflater.deflate(new byte[unzipped.length]));
         return out.toByteArray();
     }
+
     //Gets the specific hash for a directory
-    public static String getDirectoryHash(File file) throws NoSuchAlgorithmException, IOException
-    {
+    public static String getDirectoryHash(File file) throws NoSuchAlgorithmException, IOException {
         File directory = file;
         String allFiles = "";
         byte[] hashes;
-        for (File subfile : directory.listFiles())
-        {
-            if (subfile.isDirectory())
-            {
+        for (File subfile : directory.listFiles()) {
+            if (subfile.isDirectory()) {
                 //Recursively calls itself
                 allFiles += getDirectoryHash(subfile);
-            }
-            else
-            {
-                allFiles += "blob " +  hashBlob(Files.readAllBytes(subfile.toPath())) + " " + subfile.getName() + "\n";
+            } else {
+                allFiles += "blob " + hashBlob(Files.readAllBytes(subfile.toPath())) + " " + subfile.getName() + "\n";
             }
         }
         hashes = allFiles.getBytes();
@@ -187,6 +178,28 @@ public class Git {
         finalHash = hashBlob(hashes);
         System.out.println("the final hash is " + finalHash);
         return finalHash;
+    }
+
+    public static void createRootTreeSnapshot(String rootDirPath) throws IOException, NoSuchAlgorithmException {
+        File rootDir = new File(rootDirPath);
+        if (!rootDir.exists() || !rootDir.isDirectory()) {
+            throw new IOException("Invalid root directory: " + rootDirPath);
+        }
+
+        // Recursively create blobs and tree files for the entire directory structure
+        String rootTreeHash = getDirectoryHash(rootDir); // Get the hash of the root directory
+
+        // Add the tree structure for the root directory
+        addTree(rootDir.getPath(), rootDir.getName());
+
+        // Save the root tree hash in the HEAD file
+        File rootTreeFile = new File("./git/HEAD");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(rootTreeFile))) {
+            writer.write("tree " + rootTreeHash + " " + rootDirPath);
+            writer.newLine();
+        }
+
+        System.out.println("Root tree snapshot created with hash: " + rootTreeHash);
     }
 
 }

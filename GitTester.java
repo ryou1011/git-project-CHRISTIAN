@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 
 public class GitTester {
+    
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         Git hub = new Git();
         if (initWorking())
